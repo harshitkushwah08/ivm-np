@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Building2, Users, CheckCircle, Clock, Phone, Mail, TrendingUp } from 'lucide-react';
 
-const DepartmentsPage = ({ departments, issues }) => {
+const DepartmentsPage = ({ departments, issues, language, translations }) => {
   const [selectedDepartment, setSelectedDepartment] = useState(null);
 
   const getDepartmentIssues = (departmentId) => {
@@ -28,9 +28,9 @@ const DepartmentsPage = ({ departments, issues }) => {
       {/* Header */}
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-gray-800 mb-2">
-          विभाग प्रबंधन / Department Management
+          {translations.departmentManagement}
         </h2>
-        <p className="text-gray-600">सभी नगर निगम विभागों की जानकारी और प्रदर्शन / Information and performance of all municipal departments</p>
+        <p className="text-gray-600">{translations.departmentManagementDesc}</p>
       </div>
 
       {/* Departments Grid */}
@@ -52,7 +52,7 @@ const DepartmentsPage = ({ departments, issues }) => {
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-800">{department.name}</h3>
-                    <p className="text-sm text-gray-600">प्रमुख: {department.head}</p>
+                    <p className="text-sm text-gray-600">{translations.head}: {department.head}</p>
                   </div>
                 </div>
               </div>
@@ -62,18 +62,18 @@ const DepartmentsPage = ({ departments, issues }) => {
                 <div className="grid grid-cols-2 gap-4 mb-4">
                   <div className="text-center">
                     <div className="text-2xl font-bold text-blue-600">{stats.total}</div>
-                    <div className="text-xs text-gray-600">कुल शिकायतें / Total Issues</div>
+                    <div className="text-xs text-gray-600">{translations.totalIssues}</div>
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-green-600">{stats.completed}</div>
-                    <div className="text-xs text-gray-600">पूर्ण / Completed</div>
+                    <div className="text-xs text-gray-600">{translations.completed}</div>
                   </div>
                 </div>
 
                 {/* Progress Bar */}
                 <div className="mb-4">
                   <div className="flex justify-between text-sm text-gray-600 mb-1">
-                    <span>पूर्णता दर / Completion Rate</span>
+                    <span>{translations.completionRate}</span>
                     <span>{stats.completionRate}%</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
@@ -101,15 +101,15 @@ const DepartmentsPage = ({ departments, issues }) => {
                   <div className="flex justify-between text-xs">
                     <div className="text-center">
                       <div className="text-red-600 font-semibold">{stats.pending}</div>
-                      <div className="text-gray-500">लंबित</div>
+                      <div className="text-gray-500">{translations.pending}</div>
                     </div>
                     <div className="text-center">
                       <div className="text-yellow-600 font-semibold">{stats.inProgress}</div>
-                      <div className="text-gray-500">प्रगतिशील</div>
+                      <div className="text-gray-500">{translations.inProgress}</div>
                     </div>
                     <div className="text-center">
                       <div className="text-green-600 font-semibold">{stats.completed}</div>
-                      <div className="text-gray-500">पूर्ण</div>
+                      <div className="text-gray-500">{translations.completed}</div>
                     </div>
                   </div>
                 </div>
@@ -125,7 +125,7 @@ const DepartmentsPage = ({ departments, issues }) => {
           <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-screen overflow-y-auto m-4">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-xl font-bold text-gray-800">
-                {selectedDepartment.name} - विस्तृत विवरण
+                {selectedDepartment.name} - {translations.detailedView}
               </h3>
               <button
                 onClick={() => setSelectedDepartment(null)}
@@ -138,16 +138,16 @@ const DepartmentsPage = ({ departments, issues }) => {
             {/* Department Info */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div className="space-y-4">
-                <h4 className="font-semibold text-gray-800">विभाग जानकारी / Department Information</h4>
+                <h4 className="font-semibold text-gray-800">{translations.departmentInfo}</h4>
                 <div className="space-y-2 text-sm">
-                  <div><span className="font-medium">प्रमुख / Head:</span> {selectedDepartment.head}</div>
-                  <div><span className="font-medium">फोन / Phone:</span> {selectedDepartment.phone}</div>
-                  <div><span className="font-medium">ईमेल / Email:</span> {selectedDepartment.email}</div>
+                  <div><span className="font-medium">{translations.head}:</span> {selectedDepartment.head}</div>
+                  <div><span className="font-medium">{translations.phone}:</span> {selectedDepartment.phone}</div>
+                  <div><span className="font-medium">{translations.email}:</span> {selectedDepartment.email}</div>
                 </div>
               </div>
 
               <div className="space-y-4">
-                <h4 className="font-semibold text-gray-800">प्रदर्शन / Performance</h4>
+                <h4 className="font-semibold text-gray-800">{translations.performance}</h4>
                 <div className="grid grid-cols-2 gap-4">
                   {(() => {
                     const stats = getDepartmentStats(selectedDepartment.id);
@@ -155,11 +155,11 @@ const DepartmentsPage = ({ departments, issues }) => {
                       <>
                         <div className="text-center p-3 bg-blue-50 rounded-lg">
                           <div className="text-xl font-bold text-blue-600">{stats.total}</div>
-                          <div className="text-xs text-gray-600">कुल शिकायतें</div>
+                          <div className="text-xs text-gray-600">{translations.totalIssues}</div>
                         </div>
                         <div className="text-center p-3 bg-green-50 rounded-lg">
                           <div className="text-xl font-bold text-green-600">{stats.completionRate}%</div>
-                          <div className="text-xs text-gray-600">पूर्णता दर</div>
+                          <div className="text-xs text-gray-600">{translations.completionRate}</div>
                         </div>
                       </>
                     );
@@ -171,7 +171,7 @@ const DepartmentsPage = ({ departments, issues }) => {
             {/* Assigned Issues */}
             <div>
               <h4 className="font-semibold text-gray-800 mb-4">
-                आवंटित शिकायतें / Assigned Issues ({getDepartmentIssues(selectedDepartment.id).length})
+                {translations.assignedIssues} ({getDepartmentIssues(selectedDepartment.id).length})
               </h4>
               <div className="space-y-3 max-h-64 overflow-y-auto">
                 {getDepartmentIssues(selectedDepartment.id).map((issue) => (
@@ -184,14 +184,14 @@ const DepartmentsPage = ({ departments, issues }) => {
                         issue.status === 'assigned' ? 'bg-blue-100 text-blue-800' :
                         'bg-red-100 text-red-800'
                       }`}>
-                        {issue.status === 'completed' ? 'पूर्ण' :
-                         issue.status === 'in-progress' ? 'प्रगतिशील' :
-                         issue.status === 'assigned' ? 'आवंटित' : 'लंबित'}
+                        {issue.status === 'completed' ? translations.completed :
+                         issue.status === 'in-progress' ? translations.inProgress :
+                         issue.status === 'assigned' ? translations.assigned : translations.pending}
                       </span>
                     </div>
                     <p className="text-sm text-gray-600 line-clamp-2">{issue.title}</p>
                     <p className="text-xs text-gray-500 mt-1">
-                      {new Date(issue.createdAt).toLocaleDateString('hi-IN')}
+                      {new Date(issue.createdAt).toLocaleDateString(language === 'hi' ? 'hi-IN' : 'en-IN')}
                     </p>
                   </div>
                 ))}
@@ -199,7 +199,7 @@ const DepartmentsPage = ({ departments, issues }) => {
                 {getDepartmentIssues(selectedDepartment.id).length === 0 && (
                   <div className="text-center py-8 text-gray-500">
                     <Clock className="mx-auto h-8 w-8 mb-2" />
-                    <p>कोई शिकायत आवंटित नहीं / No issues assigned</p>
+                    <p>{translations.noIssuesAssigned}</p>
                   </div>
                 )}
               </div>

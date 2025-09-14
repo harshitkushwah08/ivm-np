@@ -1,171 +1,205 @@
 import React, { useState, useEffect } from 'react';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { Filter, X } from 'lucide-react';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
 
-const MapView = ({ issues, onIssueSelect, language = 'hi' }) => {
-  const [hoveredIssue, setHoveredIssue] = useState(null);
+// Fix for default markers in react-leaflet
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
+
+// Custom marker icons for different priorities
+const createCustomIcon = (priority) => {
+  const color = priority === 'high' ? '#DC2626' : 
+                priority === 'medium' ? '#D97706' : '#059669';
+  
+  return L.divIcon({
+    className: 'custom-marker',
+    html: `<div style="background-color: ${color}; width: 20px; height: 20px; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>`,
+    iconSize: [20, 20],
+    iconAnchor: [10, 10]
+  });
+};
+
+const MapView = ({ issues, onIssueSelect, language, translations }) => {
   const [filter, setFilter] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
+
+  // Indore coordinates
+  const indoreCenter = [22.7196, 75.8577];
 
   const filteredIssues = issues.filter(issue => 
     filter === 'all' || issue.priority === filter
   );
 
-  const getPinColor = (priority) => {
-    switch (priority) {
-      case 'high': return '#DC2626'; // Red
-      case 'medium': return '#D97706'; // Yellow/Orange
-      case 'low': return '#059669'; // Green
-      default: return '#6B7280'; // Gray
-    }
-  };
-
   const getPriorityLabel = (priority) => {
-    switch (priority) {
-      case 'high': return language === 'hi' ? 'उच्च' : 'High';
-      case 'medium': return language === 'hi' ? 'मध्यम' : 'Medium';
-      case 'low': return language === 'hi' ? 'कम' : 'Low';
-      default: return priority;
-    }
+    const labels = {
+      high: { hi: 'उच्च', en: 'High' },
+      medium: { hi: 'मध्यम', en: 'Medium' },
+      low: { hi: 'कम', en: 'Low' }
+    };
+    return labels[priority]?.[language] || priority;
   };
 
   const getStatusLabel = (status) => {
-    switch (status) {
-      case 'pending': return language === 'hi' ? 'लंबित' : 'Pending';
-      case 'assigned': return language === 'hi' ? 'आवंटित' : 'Assigned';
-      case 'in-progress': return language === 'hi' ? 'प्रगतिशील' : 'In Progress';
-      case 'completed': return language === 'hi' ? 'पूर्ण' : 'Completed';
-      default: return status;
-    }
+    const labels = {
+      pending: { hi: 'लंबित', en: 'Pending' },
+      assigned: { hi: 'आवंटित', en: 'Assigned' },
+      'in-progress': { hi: 'प्रगतिशील', en: 'In Progress' },
+      completed: { hi: 'पूर्ण', en: 'Completed' }
+    };
+    return labels[status]?.[language] || status;
   };
 
   return (
-    <div className="flex-1 bg-gray-50 relative">
-      {/* Filter Bar */}
-      <div className="absolute top-4 left-4 z-10 bg-white rounded-lg shadow-lg p-4">
-        <div className="flex items-center space-x-4">
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center space-x-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <Filter size={16} />
-            <span>{language === 'hi' ? 'फिल्टर' : 'Filter'}</span>
-          </button>
+    <div className="flex h-full">
+      {/* Left Sidebar - Issues List */}
+      <div className="w-80 bg-white border-r border-gray-200 flex flex-col">
+        {/* Header */}
+        <div className="p-4 border-b border-gray-200">
+          <h3 className="font-semibold text-gray-800 mb-3">
+            {translations.issuesList}
+          </h3>
           
-          {showFilters && (
-            <div className="flex space-x-2">
-              {['all', 'high', 'medium', 'low'].map((priority) => (
-                <button
-                  key={priority}
-                  onClick={() => setFilter(priority)}
-                  className={`px-3 py-2 rounded-lg text-sm transition-colors ${
-                    filter === priority
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                  }`}
-                >
-                  {priority === 'all' ? (language === 'hi' ? 'सभी' : 'All') : getPriorityLabel(priority)}
-                </button>
-              ))}
+          {/* Filter buttons */}
+          <div className="flex flex-wrap gap-2">
+            {['all', 'high', 'medium', 'low'].map((priority) => (
+              <button
+                key={priority}
+                onClick={() => setFilter(priority)}
+                className={`px-3 py-1 rounded-full text-xs transition-colors ${
+                  filter === priority
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                {priority === 'all' ? translations.all : getPriorityLabel(priority)}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Issues List */}
+        <div className="flex-1 overflow-y-auto">
+          {filteredIssues.map((issue) => (
+            <div
+              key={issue.id}
+              onClick={() => onIssueSelect(issue)}
+              className={`p-4 border-b border-gray-100 cursor-pointer transition-colors border-l-4 hover:bg-gray-50 ${
+                issue.priority === 'high' ? 'border-l-red-500 bg-red-50' :
+                issue.priority === 'medium' ? 'border-l-yellow-500 bg-yellow-50' :
+                'border-l-green-500 bg-green-50'
+              }`}
+            >
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-blue-600">
+                    {issue.complaintNumber}
+                  </span>
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    issue.priority === 'high' ? 'bg-red-100 text-red-800' :
+                    issue.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                    'bg-green-100 text-green-800'
+                  }`}>
+                    {getPriorityLabel(issue.priority)}
+                  </span>
+                </div>
+                
+                <h4 className="font-semibold text-gray-800 text-sm line-clamp-2">
+                  {issue.title}
+                </h4>
+                
+                <p className="text-xs text-gray-600 line-clamp-2">
+                  {issue.description}
+                </p>
+                
+                <div className="flex justify-between items-center text-xs text-gray-500">
+                  <span>{issue.userName}</span>
+                  <span>{getStatusLabel(issue.status)}</span>
+                </div>
+                
+                <div className="text-xs text-gray-500">
+                  {issue.location.address}
+                </div>
+              </div>
+            </div>
+          ))}
+          
+          {filteredIssues.length === 0 && (
+            <div className="p-8 text-center text-gray-500">
+              <div className="text-lg mb-2">{translations.noIssuesFound}</div>
             </div>
           )}
+        </div>
+
+        {/* Legend */}
+        <div className="p-4 border-t border-gray-200 bg-gray-50">
+          <h4 className="font-semibold text-gray-800 mb-2">
+            {translations.priority}
+          </h4>
+          <div className="space-y-2">
+            {[
+              { priority: 'high', color: '#DC2626' },
+              { priority: 'medium', color: '#D97706' },
+              { priority: 'low', color: '#059669' }
+            ].map(({ priority, color }) => (
+              <div key={priority} className="flex items-center space-x-2">
+                <div
+                  className="w-4 h-4 rounded-full"
+                  style={{ backgroundColor: color }}
+                />
+                <span className="text-sm text-gray-700">{getPriorityLabel(priority)}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
       {/* Map Container */}
-      <div className="relative w-full h-full bg-gradient-to-br from-green-50 via-blue-50 to-gray-100 overflow-hidden">
-        {/* Map Background (Simulated) */}
-        <div className="absolute inset-0">
-          {/* Enhanced Map Background */}
-          <div className="absolute inset-0 bg-gradient-to-br from-green-100 via-blue-50 to-gray-50 opacity-60"></div>
+      <div className="flex-1 relative">
+        <MapContainer
+          center={indoreCenter}
+          zoom={12}
+          style={{ height: '100%', width: '100%' }}
+          className="z-0"
+        >
+          <TileLayer
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          />
           
-          {/* Simulated map grid */}
-          <div className="absolute inset-0 opacity-10">
-            {Array.from({ length: 25 }).map((_, i) => (
-              <div
-                key={`h-${i}`}
-                className="absolute border-t border-blue-300"
-                style={{ top: `${(i + 1) * 4}%`, width: '100%' }}
-              />
-            ))}
-            {Array.from({ length: 35 }).map((_, i) => (
-              <div
-                key={`v-${i}`}
-                className="absolute border-l border-blue-300"
-                style={{ left: `${(i + 1) * 2.86}%`, height: '100%' }}
-              />
-            ))}
-          </div>
-          
-          {/* Simulated Roads */}
-          <div className="absolute inset-0 opacity-30">
-            <div className="absolute bg-gray-400 h-1" style={{ top: '30%', left: '10%', width: '80%' }}></div>
-            <div className="absolute bg-gray-400 h-1" style={{ top: '60%', left: '15%', width: '70%' }}></div>
-            <div className="absolute bg-gray-400 w-1" style={{ left: '40%', top: '20%', height: '60%' }}></div>
-            <div className="absolute bg-gray-400 w-1" style={{ left: '70%', top: '25%', height: '50%' }}></div>
-          </div>
-          
-          {/* Landmarks */}
-          <div className="absolute inset-0">
-            <div className="absolute w-4 h-4 bg-green-600 rounded-full" style={{ top: '35%', left: '45%' }} title="Central Park"></div>
-            <div className="absolute w-3 h-3 bg-blue-600 rounded-full" style={{ top: '50%', left: '60%' }} title="Government Office"></div>
-            <div className="absolute w-3 h-3 bg-red-600 rounded-full" style={{ top: '40%', left: '30%' }} title="Hospital"></div>
-          </div>
-
-          {/* City label */}
-          <div className="absolute top-8 right-8 bg-white bg-opacity-90 px-4 py-2 rounded-lg">
-            <h3 className="font-bold text-gray-800">
-              {language === 'hi' ? 'इंदौर, मध्य प्रदेश' : 'Indore, Madhya Pradesh'}
-            </h3>
-            <p className="text-sm text-gray-600">
-              {language === 'hi' ? 'Indore, Madhya Pradesh' : 'इंदौर, मध्य प्रदेश'}
-            </p>
-          </div>
-
-          {/* Issue Pins */}
           {filteredIssues.map((issue) => (
-            <div
+            <Marker
               key={issue.id}
-              className="absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer"
-              style={{
-                left: `${((issue.location.lng - 75.8) / 0.15) * 100}%`,
-                top: `${((22.75 - issue.location.lat) / 0.08) * 100}%`,
-              }}
-              onMouseEnter={() => setHoveredIssue(issue)}
-              onMouseLeave={() => setHoveredIssue(null)}
-              onClick={() => onIssueSelect(issue)}
+              position={[issue.location.lat, issue.location.lng]}
+              icon={createCustomIcon(issue.priority)}
             >
-              {/* Pin */}
-              <div className="relative">
-                <div
-                  className="w-6 h-6 rounded-full border-2 border-white shadow-lg transform transition-transform hover:scale-125"
-                  style={{ backgroundColor: getPinColor(issue.priority) }}
-                />
-                <div
-                  className="absolute top-6 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-2 border-r-2 border-t-4 border-transparent"
-                  style={{ borderTopColor: getPinColor(issue.priority) }}
-                />
-              </div>
-
-              {/* Hover Tooltip */}
-              {hoveredIssue?.id === issue.id && (
-                <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 bg-white rounded-lg shadow-xl p-3 min-w-64 z-20 border">
+              <Popup>
+                <div className="p-2 min-w-64">
                   <div className="space-y-2">
                     <div className="font-semibold text-gray-800">
-                      {language === 'hi' ? 'शिकायत संख्या:' : 'Complaint No:'} {issue.complaintNumber}
+                      {translations.complaintNo}: {issue.complaintNumber}
                     </div>
                     <div className="text-sm text-gray-600">
-                      {language === 'hi' ? 'नाम:' : 'Name:'} {issue.userName}
+                      {translations.name}: {issue.userName}
                     </div>
                     <div className="text-sm font-medium text-gray-800">
                       {issue.title}
                     </div>
                     <div className="text-xs text-gray-500">
-                      {issue.description.slice(0, 80)}...
+                      {issue.description.slice(0, 100)}...
                     </div>
                     <div className="flex items-center justify-between">
                       <span
                         className="px-2 py-1 rounded-full text-xs text-white font-medium"
-                        style={{ backgroundColor: getPinColor(issue.priority) }}
+                        style={{ 
+                          backgroundColor: issue.priority === 'high' ? '#DC2626' : 
+                                          issue.priority === 'medium' ? '#D97706' : '#059669'
+                        }}
                       >
                         {getPriorityLabel(issue.priority)}
                       </span>
@@ -173,44 +207,22 @@ const MapView = ({ issues, onIssueSelect, language = 'hi' }) => {
                         {getStatusLabel(issue.status)}
                       </span>
                     </div>
+                    <div className="text-xs text-gray-500">
+                      {issue.location.address}
+                    </div>
                   </div>
                 </div>
-              )}
-            </div>
+              </Popup>
+            </Marker>
           ))}
-        </div>
-      </div>
+        </MapContainer>
 
-      {/* Legend */}
-      <div className="absolute bottom-4 left-4 bg-white rounded-lg shadow-lg p-4">
-        <h4 className="font-semibold text-gray-800 mb-2">
-          {language === 'hi' ? 'प्राथमिकता' : 'Priority'}
-        </h4>
-        <div className="space-y-2">
-          {[
-            { priority: 'high', label: language === 'hi' ? 'उच्च' : 'High' },
-            { priority: 'medium', label: language === 'hi' ? 'मध्यम' : 'Medium' },
-            { priority: 'low', label: language === 'hi' ? 'कम' : 'Low' }
-          ].map(({ priority, label }) => (
-            <div key={priority} className="flex items-center space-x-2">
-              <div
-                className="w-4 h-4 rounded-full"
-                style={{ backgroundColor: getPinColor(priority) }}
-              />
-              <span className="text-sm text-gray-700">{label}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Issue Count */}
-      <div className="absolute bottom-4 right-4 bg-white rounded-lg shadow-lg p-4">
-        <h4 className="font-semibold text-gray-800 mb-2">
-          {language === 'hi' ? 'कुल शिकायतें' : 'Total Issues'}
-        </h4>
-        <div className="text-2xl font-bold text-blue-600">{filteredIssues.length}</div>
-        <div className="text-sm text-gray-600">
-          {language === 'hi' ? 'Total Issues' : 'कुल शिकायतें'}
+        {/* Issue Count */}
+        <div className="absolute bottom-4 right-4 bg-white rounded-lg shadow-lg p-4 z-10">
+          <h4 className="font-semibold text-gray-800 mb-2">
+            {translations.totalIssues}
+          </h4>
+          <div className="text-2xl font-bold text-blue-600">{filteredIssues.length}</div>
         </div>
       </div>
     </div>

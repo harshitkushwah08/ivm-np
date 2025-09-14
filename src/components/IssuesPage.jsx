@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Search, Filter, Eye, Calendar, MapPin, User, Phone, AlertCircle } from 'lucide-react';
 import AssignDepartmentModal from './AssignDepartmentModal';
 
-const IssuesPage = ({ issues, departments, onAssignDepartment, onUpdateIssueStatus }) => {
+const IssuesPage = ({ issues, departments, onAssignDepartment, onUpdateIssueStatus, language, translations }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterPriority, setFilterPriority] = useState('all');
@@ -38,22 +38,22 @@ const IssuesPage = ({ issues, departments, onAssignDepartment, onUpdateIssueStat
   };
 
   const getPriorityLabel = (priority) => {
-    switch (priority) {
-      case 'high': return 'उच्च / High';
-      case 'medium': return 'मध्यम / Medium';
-      case 'low': return 'कम / Low';
-      default: return priority;
-    }
+    const labels = {
+      high: translations.high,
+      medium: translations.medium,
+      low: translations.low
+    };
+    return labels[priority] || priority;
   };
 
   const getStatusLabel = (status) => {
-    switch (status) {
-      case 'pending': return 'लंबित / Pending';
-      case 'assigned': return 'आवंटित / Assigned';
-      case 'in-progress': return 'प्रगतिशील / In Progress';
-      case 'completed': return 'पूर्ण / Completed';
-      default: return status;
-    }
+    const labels = {
+      pending: translations.pending,
+      assigned: translations.assigned,
+      'in-progress': translations.inProgress,
+      completed: translations.completed
+    };
+    return labels[status] || status;
   };
 
   const handleAssignDepartment = (issueId, departmentIds) => {
@@ -67,9 +67,9 @@ const IssuesPage = ({ issues, departments, onAssignDepartment, onUpdateIssueStat
       {/* Header */}
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-gray-800 mb-2">
-          शिकायत प्रबंधन / Issue Management
+          {translations.issueManagement}
         </h2>
-        <p className="text-gray-600">सभी शिकायतों का विस्तृत विवरण / Detailed view of all issues</p>
+        <p className="text-gray-600">{translations.issueManagementDesc}</p>
       </div>
 
       {/* Filters */}
@@ -80,7 +80,7 @@ const IssuesPage = ({ issues, departments, onAssignDepartment, onUpdateIssueStat
             <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
             <input
               type="text"
-              placeholder="खोजें... / Search..."
+              placeholder={translations.search}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -93,11 +93,11 @@ const IssuesPage = ({ issues, departments, onAssignDepartment, onUpdateIssueStat
             onChange={(e) => setFilterStatus(e.target.value)}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
-            <option value="all">सभी स्थिति / All Status</option>
-            <option value="pending">लंबित / Pending</option>
-            <option value="assigned">आवंटित / Assigned</option>
-            <option value="in-progress">प्रगतिशील / In Progress</option>
-            <option value="completed">पूर्ण / Completed</option>
+            <option value="all">{translations.allStatus}</option>
+            <option value="pending">{translations.pending}</option>
+            <option value="assigned">{translations.assigned}</option>
+            <option value="in-progress">{translations.inProgress}</option>
+            <option value="completed">{translations.completed}</option>
           </select>
 
           {/* Priority Filter */}
@@ -106,10 +106,10 @@ const IssuesPage = ({ issues, departments, onAssignDepartment, onUpdateIssueStat
             onChange={(e) => setFilterPriority(e.target.value)}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
-            <option value="all">सभी प्राथमिकता / All Priority</option>
-            <option value="high">उच्च / High</option>
-            <option value="medium">मध्यम / Medium</option>
-            <option value="low">कम / Low</option>
+           <option value="all">{translations.allPriority}</option>
+           <option value="high">{translations.high}</option>
+           <option value="medium">{translations.medium}</option>
+           <option value="low">{translations.low}</option>
           </select>
         </div>
       </div>
@@ -154,14 +154,14 @@ const IssuesPage = ({ issues, departments, onAssignDepartment, onUpdateIssueStat
               
               <div className="flex items-center space-x-2 text-sm text-gray-600">
                 <Calendar size={16} />
-                <span>बनाया गया: {new Date(issue.createdAt).toLocaleDateString('hi-IN')}</span>
+                <span>{translations.created}: {new Date(issue.createdAt).toLocaleDateString(language === 'hi' ? 'hi-IN' : 'en-IN')}</span>
               </div>
 
               {/* Assigned Departments */}
               {issue.assignedDepartments.length > 0 && (
                 <div className="mt-3">
                   <p className="text-sm font-medium text-gray-700 mb-1">
-                    आवंटित विभाग / Assigned Departments:
+                    {translations.assignedDepartments}:
                   </p>
                   <div className="flex flex-wrap gap-1">
                     {issue.assignedDepartments.map((deptId) => {
@@ -187,7 +187,7 @@ const IssuesPage = ({ issues, departments, onAssignDepartment, onUpdateIssueStat
                   }}
                   className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
                 >
-                  विभाग आवंटित करें / Assign Department
+                  {translations.assignDepartment}
                 </button>
                 
                 {issue.status === 'assigned' || issue.status === 'in-progress' ? (
@@ -195,14 +195,14 @@ const IssuesPage = ({ issues, departments, onAssignDepartment, onUpdateIssueStat
                     onClick={() => onUpdateIssueStatus(issue.id, 'completed')}
                     className="flex-1 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
                   >
-                    पूर्ण चिह्नित करें / Mark Complete
+                    {translations.markComplete}
                   </button>
                 ) : issue.status === 'completed' ? (
                   <button
                     onClick={() => onUpdateIssueStatus(issue.id, 'pending')}
                     className="flex-1 bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
                   >
-                    पुनः खोलें / Reopen
+                    {translations.reopen}
                   </button>
                 ) : null}
               </div>
@@ -214,8 +214,8 @@ const IssuesPage = ({ issues, departments, onAssignDepartment, onUpdateIssueStat
       {filteredIssues.length === 0 && (
         <div className="text-center py-12">
           <AlertCircle className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">कोई शिकायत नहीं मिली</h3>
-          <p className="text-gray-500">No issues found matching your criteria</p>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">{translations.noIssuesFound}</h3>
+          <p className="text-gray-500">{translations.noIssuesFoundDesc}</p>
         </div>
       )}
 
@@ -229,6 +229,8 @@ const IssuesPage = ({ issues, departments, onAssignDepartment, onUpdateIssueStat
             setShowAssignModal(false);
             setSelectedIssue(null);
           }}
+          language={language}
+          translations={translations}
         />
       )}
     </div>

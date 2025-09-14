@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Shield, Smartphone, RefreshCw } from 'lucide-react';
 
-const TwoFactorAuth = ({ onSuccess, language = 'hi', onToggleLanguage }) => {
+const TwoFactorAuth = ({ onSuccess, language = 'hi', onToggleLanguage, translations }) => {
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [loading, setLoading] = useState(false);
   const [timeLeft, setTimeLeft] = useState(120);
@@ -38,8 +38,7 @@ const TwoFactorAuth = ({ onSuccess, language = 'hi', onToggleLanguage }) => {
       if (enteredOtp === generatedOTP) {
         onSuccess();
       } else {
-        const message = language === 'hi' ? 'गलत OTP' : 'Invalid OTP';
-        alert(message);
+        alert(translations.invalidOTP);
         setOtp(['', '', '', '', '', '']);
       }
       setLoading(false);
@@ -49,8 +48,7 @@ const TwoFactorAuth = ({ onSuccess, language = 'hi', onToggleLanguage }) => {
   const resendOTP = () => {
     setTimeLeft(120);
     setOtp(['', '', '', '', '', '']);
-    const message = language === 'hi' ? 'नया OTP भेजा गया' : 'New OTP sent';
-    alert(message);
+    alert(translations.newOTPSent);
   };
 
   const formatTime = (seconds) => {
@@ -69,7 +67,7 @@ const TwoFactorAuth = ({ onSuccess, language = 'hi', onToggleLanguage }) => {
             className="flex items-center space-x-2 px-3 py-2 bg-white hover:bg-gray-50 rounded-lg shadow-sm transition-colors border"
           >
             <span className="text-sm font-medium text-gray-700">
-              {language === 'hi' ? 'English' : 'हिंदी'}
+              {translations.switchLanguage}
             </span>
           </button>
         </div>
@@ -79,10 +77,10 @@ const TwoFactorAuth = ({ onSuccess, language = 'hi', onToggleLanguage }) => {
             <Shield className="w-10 h-10 text-white" />
           </div>
           <h1 className="text-2xl font-bold text-gray-800 mb-2">
-            {language === 'hi' ? 'दो-कारक सत्यापन' : 'Two-Factor Authentication'}
+            {translations.twoFactorAuth}
           </h1>
           <h2 className="text-lg font-semibold text-blue-600 mb-1">
-            {language === 'hi' ? 'Two-Factor Authentication' : 'दो-कारक सत्यापन'}
+            {translations.twoFactorAuthSecondary}
           </h2>
         </div>
 
@@ -90,13 +88,10 @@ const TwoFactorAuth = ({ onSuccess, language = 'hi', onToggleLanguage }) => {
           <div className="text-center mb-6">
             <Smartphone className="mx-auto h-12 w-12 text-green-600 mb-4" />
             <h3 className="text-xl font-semibold text-gray-800 mb-2">
-              {language === 'hi' ? 'OTP सत्यापन' : 'OTP Verification'}
+              {translations.otpVerification}
             </h3>
             <p className="text-sm text-gray-600">
-              {language === 'hi' 
-                ? 'आपके फोन पर भेजा गया 6-अंकीय कोड दर्ज करें'
-                : 'Enter the 6-digit code sent to your phone'
-              }
+              {translations.enterOTPCode}
             </p>
           </div>
 
@@ -117,14 +112,11 @@ const TwoFactorAuth = ({ onSuccess, language = 'hi', onToggleLanguage }) => {
 
             <div className="text-center">
               <p className="text-sm text-gray-600 mb-2">
-                {language === 'hi' ? 'समय शेष:' : 'Time remaining:'} <span className="font-semibold text-red-600">{formatTime(timeLeft)}</span>
+                {translations.timeRemaining} <span className="font-semibold text-red-600">{formatTime(timeLeft)}</span>
               </p>
               {timeLeft > 0 ? (
                 <p className="text-xs text-gray-500">
-                  {language === 'hi' 
-                    ? `कोड नहीं मिला? ${timeLeft} सेकंड बाद दोबारा भेजें`
-                    : `Didn't receive code? Resend in ${timeLeft} seconds`
-                  }
+                  {translations.didntReceiveCode.replace('{seconds}', timeLeft)}
                 </p>
               ) : (
                 <button
@@ -133,7 +125,7 @@ const TwoFactorAuth = ({ onSuccess, language = 'hi', onToggleLanguage }) => {
                   className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center justify-center mx-auto"
                 >
                   <RefreshCw className="w-4 h-4 mr-1" />
-                  {language === 'hi' ? 'दोबारा भेजें' : 'Resend'}
+                  {translations.resend}
                 </button>
               )}
             </div>
@@ -146,17 +138,17 @@ const TwoFactorAuth = ({ onSuccess, language = 'hi', onToggleLanguage }) => {
               {loading ? (
                 <div className="flex items-center justify-center">
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                  {language === 'hi' ? 'सत्यापन हो रहा है...' : 'Verifying...'}
+                  {translations.verifying}
                 </div>
               ) : (
-                language === 'hi' ? 'सत्यापित करें' : 'Verify'
+                translations.verify
               )}
             </button>
           </form>
 
           <div className="mt-6 text-center text-sm text-gray-600">
             <p className="bg-blue-50 p-2 rounded">
-              {language === 'hi' ? 'डेमो OTP:' : 'Demo OTP:'} <span className="font-bold text-blue-600">123456</span>
+              {translations.demoOTP} <span className="font-bold text-blue-600">123456</span>
             </p>
           </div>
         </div>

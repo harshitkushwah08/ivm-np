@@ -14,27 +14,221 @@ function App() {
   const [showTwoFactor, setShowTwoFactor] = useState(false);
   const [activeTab, setActiveTab] = useState('map');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [language, setLanguage] = useState('en');
+  const [language, setLanguage] = useState('hi');
   const [isLoading, setIsLoading] = useState(false);
   const [issues, setIssues] = useState(mockIssues);
   const [departments, setDepartments] = useState(mockDepartments);
 
   const translations = {
-    en: {
-      dashboard: 'Admin Dashboard',
-      profile: 'Profile',
-      logout: 'Logout',
-      loading: 'Loading...',
-      switchToHindi: 'हिंदी',
-      nagarNigam: 'Nagar Nigam Indore'
-    },
     hi: {
-      dashboard: 'प्रशासन डैशबोर्ड',
-      profile: 'प्रोफाइल',
-      logout: 'लॉगआउट',
-      loading: 'लोड हो रहा है...',
-      switchToEnglish: 'English',
-      nagarNigam: 'नगर निगम इंदौर'
+      // Common
+      nagarNigam: 'इंदौर नगर निगम',
+      nagarNigamSecondary: 'Indore Municipal Corporation',
+      nagarNigamShort: 'इंदौर नगर निगम',
+      nagarNigamShortSecondary: 'Indore Municipal Corp.',
+      adminDashboard: 'प्रशासन डैशबोर्ड',
+      switchLanguage: 'English',
+      governmentOfIndia: 'भारत सरकार',
+      
+      // Login
+      adminLogin: 'व्यवस्थापक लॉगिन',
+      username: 'यूजरनेम',
+      password: 'पासवर्ड',
+      enterUsername: 'अपना यूजरनेम दर्ज करें',
+      enterPassword: 'अपना पासवर्ड दर्ज करें',
+      login: 'लॉग इन',
+      loggingIn: 'लॉग इन हो रहे हैं...',
+      invalidCredentials: 'गलत यूजरनेम या पासवर्ड',
+      demoCredentials: 'डेमो क्रेडेंशियल्स:',
+      
+      // Two Factor Auth
+      twoFactorAuth: 'दो-कारक सत्यापन',
+      twoFactorAuthSecondary: 'Two-Factor Authentication',
+      otpVerification: 'OTP सत्यापन',
+      enterOTPCode: 'आपके फोन पर भेजा गया 6-अंकीय कोड दर्ज करें',
+      timeRemaining: 'समय शेष:',
+      didntReceiveCode: 'कोड नहीं मिला? {seconds} सेकंड बाद दोबारा भेजें',
+      resend: 'दोबारा भेजें',
+      verify: 'सत्यापित करें',
+      verifying: 'सत्यापन हो रहा है...',
+      invalidOTP: 'गलत OTP',
+      newOTPSent: 'नया OTP भेजा गया',
+      demoOTP: 'डेमो OTP:',
+      
+      // Sidebar
+      mainMap: 'मुख्य मानचित्र',
+      mainMapSecondary: 'Main Map',
+      issues: 'शिकायतें',
+      issuesSecondary: 'Issues',
+      departments: 'विभाग',
+      departmentsSecondary: 'Departments',
+      logout: 'लॉग आउट',
+      logoutSecondary: 'Logout',
+      
+      // Map
+      issuesList: 'शिकायतें सूची',
+      all: 'सभी',
+      priority: 'प्राथमिकता',
+      high: 'उच्च',
+      medium: 'मध्यम',
+      low: 'कम',
+      pending: 'लंबित',
+      assigned: 'आवंटित',
+      inProgress: 'प्रगतिशील',
+      completed: 'पूर्ण',
+      totalIssues: 'कुल शिकायतें',
+      noIssuesFound: 'कोई शिकायत नहीं मिली',
+      complaintNo: 'शिकायत संख्या',
+      name: 'नाम',
+      
+      // Issues Page
+      issueManagement: 'शिकायत प्रबंधन',
+      issueManagementDesc: 'सभी शिकायतों का विस्तृत विवरण',
+      search: 'खोजें...',
+      allStatus: 'सभी स्थिति',
+      allPriority: 'सभी प्राथमिकता',
+      created: 'बनाया गया',
+      assignedDepartments: 'आवंटित विभाग',
+      assignDepartment: 'विभाग आवंटित करें',
+      markComplete: 'पूर्ण चिह्नित करें',
+      reopen: 'पुनः खोलें',
+      noIssuesFoundDesc: 'आपके मापदंड से मेल खाने वाली कोई शिकायत नहीं मिली',
+      
+      // Departments Page
+      departmentManagement: 'विभाग प्रबंधन',
+      departmentManagementDesc: 'सभी नगर निगम विभागों की जानकारी और प्रदर्शन',
+      head: 'प्रमुख',
+      completionRate: 'पूर्णता दर',
+      detailedView: 'विस्तृत विवरण',
+      departmentInfo: 'विभाग जानकारी',
+      phone: 'फोन',
+      email: 'ईमेल',
+      performance: 'प्रदर्शन',
+      assignedIssues: 'आवंटित शिकायतें',
+      noIssuesAssigned: 'कोई शिकायत आवंटित नहीं',
+      
+      // Assign Department Modal
+      confirmAssignment: 'पुष्टि करें',
+      issue: 'शिकायत',
+      departmentsToBeAssigned: 'आवंटित किए जाने वाले विभाग',
+      confirmAssignmentQuestion: 'क्या आप वाकई इस शिकायत को चुने गए विभागों को आवंटित करना चाहते हैं?',
+      cancel: 'रद्द करें',
+      confirm: 'पुष्टि करें',
+      issueDetails: 'शिकायत विवरण',
+      complainant: 'शिकायतकर्ता',
+      location: 'स्थान',
+      category: 'श्रेणी',
+      description: 'विवरण',
+      selectDepartments: 'विभाग चुनें',
+      selectOneOrMore: 'एक या अधिक विभाग चुन सकते हैं',
+      selectedDepartments: 'चयनित विभाग',
+      assign: 'आवंटित करें',
+      selectAtLeastOneDepartment: 'कृपया कम से कम एक विभाग का चयन करें'
+    },
+    en: {
+      // Common
+      nagarNigam: 'Indore Municipal Corporation',
+      nagarNigamSecondary: 'इंदौर नगर निगम',
+      nagarNigamShort: 'Indore Municipal Corp.',
+      nagarNigamShortSecondary: 'इंदौर नगर निगम',
+      adminDashboard: 'Admin Dashboard',
+      switchLanguage: 'हिंदी',
+      governmentOfIndia: 'Government of India',
+      
+      // Login
+      adminLogin: 'Admin Login',
+      username: 'Username',
+      password: 'Password',
+      enterUsername: 'Enter your username',
+      enterPassword: 'Enter your password',
+      login: 'Login',
+      loggingIn: 'Logging in...',
+      invalidCredentials: 'Invalid credentials',
+      demoCredentials: 'Demo Credentials:',
+      
+      // Two Factor Auth
+      twoFactorAuth: 'Two-Factor Authentication',
+      twoFactorAuthSecondary: 'दो-कारक सत्यापन',
+      otpVerification: 'OTP Verification',
+      enterOTPCode: 'Enter the 6-digit code sent to your phone',
+      timeRemaining: 'Time remaining:',
+      didntReceiveCode: 'Didn\'t receive code? Resend in {seconds} seconds',
+      resend: 'Resend',
+      verify: 'Verify',
+      verifying: 'Verifying...',
+      invalidOTP: 'Invalid OTP',
+      newOTPSent: 'New OTP sent',
+      demoOTP: 'Demo OTP:',
+      
+      // Sidebar
+      mainMap: 'Main Map',
+      mainMapSecondary: 'मुख्य मानचित्र',
+      issues: 'Issues',
+      issuesSecondary: 'शिकायतें',
+      departments: 'Departments',
+      departmentsSecondary: 'विभाग',
+      logout: 'Logout',
+      logoutSecondary: 'लॉग आउट',
+      
+      // Map
+      issuesList: 'Issues List',
+      all: 'All',
+      priority: 'Priority',
+      high: 'High',
+      medium: 'Medium',
+      low: 'Low',
+      pending: 'Pending',
+      assigned: 'Assigned',
+      inProgress: 'In Progress',
+      completed: 'Completed',
+      totalIssues: 'Total Issues',
+      noIssuesFound: 'No issues found',
+      complaintNo: 'Complaint No',
+      name: 'Name',
+      
+      // Issues Page
+      issueManagement: 'Issue Management',
+      issueManagementDesc: 'Detailed view of all issues',
+      search: 'Search...',
+      allStatus: 'All Status',
+      allPriority: 'All Priority',
+      created: 'Created',
+      assignedDepartments: 'Assigned Departments',
+      assignDepartment: 'Assign Department',
+      markComplete: 'Mark Complete',
+      reopen: 'Reopen',
+      noIssuesFoundDesc: 'No issues found matching your criteria',
+      
+      // Departments Page
+      departmentManagement: 'Department Management',
+      departmentManagementDesc: 'Information and performance of all municipal departments',
+      head: 'Head',
+      completionRate: 'Completion Rate',
+      detailedView: 'Detailed View',
+      departmentInfo: 'Department Information',
+      phone: 'Phone',
+      email: 'Email',
+      performance: 'Performance',
+      assignedIssues: 'Assigned Issues',
+      noIssuesAssigned: 'No issues assigned',
+      
+      // Assign Department Modal
+      confirmAssignment: 'Confirm Assignment',
+      issue: 'Issue',
+      departmentsToBeAssigned: 'Departments to be assigned',
+      confirmAssignmentQuestion: 'Are you sure you want to assign this issue to the selected departments?',
+      cancel: 'Cancel',
+      confirm: 'Confirm',
+      issueDetails: 'Issue Details',
+      complainant: 'Complainant',
+      location: 'Location',
+      category: 'Category',
+      description: 'Description',
+      selectDepartments: 'Select Departments',
+      selectOneOrMore: 'You can select one or more departments',
+      selectedDepartments: 'Selected Departments',
+      assign: 'Assign',
+      selectAtLeastOneDepartment: 'Please select at least one department'
     }
   };
 
@@ -105,21 +299,34 @@ function App() {
     );
   };
 
-  const onIssueSelect = (issueId) => {
-    // Handle issue selection if needed
-    console.log('Issue selected:', issueId);
+  const onIssueSelect = (issue) => {
+    console.log('Issue selected:', issue);
   };
 
   if (isLoading) {
-    return <LoadingScreen message={t.loading} />;
+    return <LoadingScreen />;
   }
 
   if (!isAuthenticated && !showTwoFactor) {
-    return <LoginPage onLogin={handleLogin} language={language} onLanguageToggle={toggleLanguage} />;
+    return (
+      <LoginPage 
+        onLogin={handleLogin} 
+        language={language} 
+        onToggleLanguage={toggleLanguage}
+        translations={t}
+      />
+    );
   }
 
   if (showTwoFactor) {
-    return <TwoFactorAuth onSuccess={handleTwoFactorSuccess} language={language} onLanguageToggle={toggleLanguage} />;
+    return (
+      <TwoFactorAuth 
+        onSuccess={handleTwoFactorSuccess} 
+        language={language} 
+        onToggleLanguage={toggleLanguage}
+        translations={t}
+      />
+    );
   }
 
   return (
@@ -131,6 +338,7 @@ function App() {
         onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
         onLogout={handleLogout}
         language={language}
+        translations={t}
       />
       
       <div className="flex-1 flex flex-col">
@@ -143,7 +351,7 @@ function App() {
               </div>
               <div>
                 <h1 className="text-xl font-semibold text-gray-900">{t.nagarNigam}</h1>
-                <p className="text-sm text-gray-500">{t.dashboard}</p>
+                <p className="text-sm text-gray-500">{t.adminDashboard}</p>
               </div>
             </div>
             
@@ -153,7 +361,7 @@ function App() {
                 className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
               >
                 <Globe className="w-4 h-4" />
-                <span>{language === 'en' ? t.switchToHindi : t.switchToEnglish}</span>
+                <span>{t.switchLanguage}</span>
               </button>
               
               <div className="flex items-center space-x-3">
@@ -162,7 +370,7 @@ function App() {
                 </div>
                 <div className="hidden md:block">
                   <p className="text-sm font-medium text-gray-900">Admin</p>
-                  <p className="text-xs text-gray-500">{t.profile}</p>
+                  <p className="text-xs text-gray-500">Profile</p>
                 </div>
                 <button
                   onClick={handleLogout}
@@ -177,9 +385,32 @@ function App() {
 
         {/* Main Content */}
         <main className="flex-1 overflow-hidden">
-          {activeTab === 'map' && <MapView language={language} issues={issues} onIssueSelect={onIssueSelect} />}
-          {activeTab === 'issues' && <IssuesPage language={language} issues={issues} departments={departments} onAssignDepartment={handleAssignDepartment} onUpdateIssueStatus={handleUpdateIssueStatus} />}
-          {activeTab === 'departments' && <DepartmentsPage language={language} departments={departments} issues={issues} />}
+          {activeTab === 'map' && (
+            <MapView 
+              language={language} 
+              issues={issues} 
+              onIssueSelect={onIssueSelect}
+              translations={t}
+            />
+          )}
+          {activeTab === 'issues' && (
+            <IssuesPage 
+              language={language} 
+              issues={issues} 
+              departments={departments} 
+              onAssignDepartment={handleAssignDepartment} 
+              onUpdateIssueStatus={handleUpdateIssueStatus}
+              translations={t}
+            />
+          )}
+          {activeTab === 'departments' && (
+            <DepartmentsPage 
+              language={language} 
+              departments={departments} 
+              issues={issues}
+              translations={t}
+            />
+          )}
         </main>
       </div>
     </div>

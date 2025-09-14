@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X, Building2, AlertTriangle } from 'lucide-react';
 
-const AssignDepartmentModal = ({ issue, departments, onAssign, onClose }) => {
+const AssignDepartmentModal = ({ issue, departments, onAssign, onClose, language, translations }) => {
   const [selectedDepartments, setSelectedDepartments] = useState(
     issue.assignedDepartments || []
   );
@@ -17,7 +17,7 @@ const AssignDepartmentModal = ({ issue, departments, onAssign, onClose }) => {
 
   const handleSubmit = () => {
     if (selectedDepartments.length === 0) {
-      alert('कृपया कम से कम एक विभाग का चयन करें / Please select at least one department');
+      alert(translations.selectAtLeastOneDepartment);
       return;
     }
     setShowConfirmation(true);
@@ -42,31 +42,28 @@ const AssignDepartmentModal = ({ issue, departments, onAssign, onClose }) => {
           <div className="flex items-center space-x-3 mb-4">
             <AlertTriangle className="h-8 w-8 text-yellow-500" />
             <h3 className="text-lg font-semibold text-gray-800">
-              पुष्टि करें / Confirm Assignment
+              {translations.confirmAssignment}
             </h3>
           </div>
 
           <div className="space-y-4 mb-6">
             <div>
               <p className="text-sm text-gray-600 mb-2">
-                <strong>शिकायत / Issue:</strong> {issue.complaintNumber}
+                <strong>{translations.issue}:</strong> {issue.complaintNumber}
               </p>
               <p className="text-sm text-gray-800 font-medium">{issue.title}</p>
             </div>
 
             <div>
               <p className="text-sm text-gray-600 mb-2">
-                <strong>आवंटित किए जाने वाले विभाग / Departments to be assigned:</strong>
+                <strong>{translations.departmentsToBeAssigned}:</strong>
               </p>
               <p className="text-sm text-gray-800">{getSelectedDepartmentNames()}</p>
             </div>
 
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
               <p className="text-sm text-yellow-800">
-                क्या आप वाकई इस शिकायत को चुने गए विभागों को आवंटित करना चाहते हैं?
-              </p>
-              <p className="text-xs text-yellow-700 mt-1">
-                Are you sure you want to assign this issue to the selected departments?
+                {translations.confirmAssignmentQuestion}
               </p>
             </div>
           </div>
@@ -76,13 +73,13 @@ const AssignDepartmentModal = ({ issue, departments, onAssign, onClose }) => {
               onClick={() => setShowConfirmation(false)}
               className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
             >
-              रद्द करें / Cancel
+              {translations.cancel}
             </button>
             <button
               onClick={handleConfirmAssignment}
               className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
-              पुष्टि करें / Confirm
+              {translations.confirm}
             </button>
           </div>
         </div>
@@ -97,7 +94,7 @@ const AssignDepartmentModal = ({ issue, departments, onAssign, onClose }) => {
         <div className="flex justify-between items-center mb-6">
           <div>
             <h3 className="text-lg font-semibold text-gray-800">
-              विभाग आवंटित करें / Assign Department
+              {translations.assignDepartment}
             </h3>
             <p className="text-sm text-gray-600">{issue.complaintNumber} - {issue.title}</p>
           </div>
@@ -111,24 +108,24 @@ const AssignDepartmentModal = ({ issue, departments, onAssign, onClose }) => {
 
         {/* Issue Details */}
         <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-          <h4 className="font-medium text-gray-800 mb-2">शिकायत विवरण / Issue Details</h4>
+          <h4 className="font-medium text-gray-800 mb-2">{translations.issueDetails}</h4>
           <div className="space-y-1 text-sm text-gray-600">
-            <p><strong>शिकायतकर्ता / Complainant:</strong> {issue.userName}</p>
-            <p><strong>स्थान / Location:</strong> {issue.location.address}</p>
-            <p><strong>श्रेणी / Category:</strong> {issue.category}</p>
-            <p><strong>प्राथमिकता / Priority:</strong> {
-              issue.priority === 'high' ? 'उच्च / High' :
-              issue.priority === 'medium' ? 'मध्यम / Medium' : 'कम / Low'
+            <p><strong>{translations.complainant}:</strong> {issue.userName}</p>
+            <p><strong>{translations.location}:</strong> {issue.location.address}</p>
+            <p><strong>{translations.category}:</strong> {issue.category}</p>
+            <p><strong>{translations.priority}:</strong> {
+              issue.priority === 'high' ? translations.high :
+              issue.priority === 'medium' ? translations.medium : translations.low
             }</p>
-            <p><strong>विवरण / Description:</strong> {issue.description}</p>
+            <p><strong>{translations.description}:</strong> {issue.description}</p>
           </div>
         </div>
 
         {/* Department Selection */}
         <div className="mb-6">
           <h4 className="font-medium text-gray-800 mb-4">
-            विभाग चुनें / Select Departments
-            <span className="text-sm text-gray-600 ml-2">(एक या अधिक विभाग चुन सकते हैं)</span>
+            {translations.selectDepartments}
+            <span className="text-sm text-gray-600 ml-2">({translations.selectOneOrMore})</span>
           </h4>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -152,14 +149,14 @@ const AssignDepartmentModal = ({ issue, departments, onAssign, onClose }) => {
                   <Building2 size={20} className="text-gray-500" />
                   <div className="flex-1">
                     <h5 className="font-medium text-gray-800">{department.name}</h5>
-                    <p className="text-xs text-gray-600">प्रमुख: {department.head}</p>
+                    <p className="text-xs text-gray-600">{translations.head}: {department.head}</p>
                     <p className="text-xs text-gray-500">{department.phone}</p>
                   </div>
                 </div>
                 
                 <div className="mt-2 text-xs text-gray-600">
-                  <span>कुल शिकायतें: {department.totalIssues}</span>
-                  <span className="ml-3">पूर्ण: {department.completedIssues}</span>
+                  <span>{translations.totalIssues}: {department.totalIssues}</span>
+                  <span className="ml-3">{translations.completed}: {department.completedIssues}</span>
                 </div>
               </div>
             ))}
@@ -170,7 +167,7 @@ const AssignDepartmentModal = ({ issue, departments, onAssign, onClose }) => {
         {selectedDepartments.length > 0 && (
           <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
             <h5 className="font-medium text-blue-800 mb-2">
-              चयनित विभाग / Selected Departments ({selectedDepartments.length})
+              {translations.selectedDepartments} ({selectedDepartments.length})
             </h5>
             <div className="flex flex-wrap gap-2">
               {departments
@@ -193,14 +190,14 @@ const AssignDepartmentModal = ({ issue, departments, onAssign, onClose }) => {
             onClick={onClose}
             className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
           >
-            रद्द करें / Cancel
+            {translations.cancel}
           </button>
           <button
             onClick={handleSubmit}
             disabled={selectedDepartments.length === 0}
             className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            आवंटित करें / Assign ({selectedDepartments.length})
+            {translations.assign} ({selectedDepartments.length})
           </button>
         </div>
       </div>

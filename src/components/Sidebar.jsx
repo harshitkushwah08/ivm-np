@@ -1,25 +1,25 @@
 import React from 'react';
 import { Map, FileText, Building2, ChevronLeft, ChevronRight, LogOut } from 'lucide-react';
 
-const Sidebar = ({ collapsed, onToggleCollapse, activeTab, onTabChange, onLogout, language = 'hi' }) => {
+const Sidebar = ({ collapsed, onToggleCollapse, activeTab, onTabChange, onLogout, language = 'hi', translations }) => {
   const menuItems = [
     { 
       id: 'map', 
-      label: language === 'hi' ? 'मुख्य मानचित्र' : 'Main Map', 
+      label: translations.mainMap, 
       icon: Map, 
-      labelSecondary: language === 'hi' ? 'Main Map' : 'मुख्य मानचित्र'
+      labelSecondary: translations.mainMapSecondary
     },
     { 
       id: 'issues', 
-      label: language === 'hi' ? 'शिकायतें' : 'Issues', 
+      label: translations.issues, 
       icon: FileText, 
-      labelSecondary: language === 'hi' ? 'Issues' : 'शिकायतें'
+      labelSecondary: translations.issuesSecondary
     },
     { 
       id: 'departments', 
-      label: language === 'hi' ? 'विभाग' : 'Departments', 
+      label: translations.departments, 
       icon: Building2, 
-      labelSecondary: language === 'hi' ? 'Departments' : 'विभाग'
+      labelSecondary: translations.departmentsSecondary
     }
   ];
 
@@ -31,10 +31,10 @@ const Sidebar = ({ collapsed, onToggleCollapse, activeTab, onTabChange, onLogout
           {!collapsed && (
             <div>
               <h2 className="font-bold text-gray-800 text-lg">
-                {language === 'hi' ? 'इंदौर नगर निगम' : 'Indore Municipal Corp.'}
+                {translations.nagarNigamShort}
               </h2>
               <p className="text-xs text-gray-600">
-                {language === 'hi' ? 'Indore Municipal Corp.' : 'इंदौर नगर निगम'}
+                {translations.nagarNigamShortSecondary}
               </p>
             </div>
           )}
@@ -85,10 +85,10 @@ const Sidebar = ({ collapsed, onToggleCollapse, activeTab, onTabChange, onLogout
           {!collapsed && (
             <div className="ml-3 text-left">
               <div className="font-medium">
-                {language === 'hi' ? 'लॉग आउट' : 'Logout'}
+                {translations.logout}
               </div>
               <div className="text-xs opacity-75">
-                {language === 'hi' ? 'Logout' : 'लॉग आउट'}
+                {translations.logoutSecondary}
               </div>
             </div>
           )}
