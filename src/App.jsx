@@ -129,6 +129,7 @@ function App() {
         onTabChange={handleTabChange}
         collapsed={sidebarCollapsed}
         onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+        onLogout={handleLogout}
         language={language}
       />
       

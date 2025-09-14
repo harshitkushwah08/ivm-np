@@ -1,7 +1,7 @@
 import React from 'react';
 import { Map, FileText, Building2, ChevronLeft, ChevronRight, LogOut } from 'lucide-react';
 
-const Sidebar = ({ isOpen, setIsOpen, activeTab, setActiveTab, onLogout, language = 'hi' }) => {
+const Sidebar = ({ collapsed, onToggleCollapse, activeTab, onTabChange, onLogout, language = 'hi' }) => {
   const menuItems = [
     { 
       id: 'map', 
@@ -24,11 +24,11 @@ const Sidebar = ({ isOpen, setIsOpen, activeTab, setActiveTab, onLogout, languag
   ];
 
   return (
-    <div className={`${isOpen ? 'w-64' : 'w-16'} bg-white shadow-lg border-r border-gray-200 transition-all duration-300 flex flex-col`}>
+    <div className={`${!collapsed ? 'w-64' : 'w-16'} bg-white shadow-lg border-r border-gray-200 transition-all duration-300 flex flex-col`}>
       {/* Header */}
       <div className="p-4 border-b border-gray-200">
         <div className="flex items-center justify-between">
-          {isOpen && (
+          {!collapsed && (
             <div>
               <h2 className="font-bold text-gray-800 text-lg">
                 {language === 'hi' ? 'इंदौर नगर निगम' : 'Indore Municipal Corp.'}
@@ -39,10 +39,10 @@ const Sidebar = ({ isOpen, setIsOpen, activeTab, setActiveTab, onLogout, languag
             </div>
           )}
           <button
-            onClick={() => setIsOpen(!isOpen)}
+            onClick={onToggleCollapse}
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
           >
-            {isOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
+            {!collapsed ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
           </button>
         </div>
       </div>
@@ -55,7 +55,7 @@ const Sidebar = ({ isOpen, setIsOpen, activeTab, setActiveTab, onLogout, languag
             return (
               <button
                 key={item.id}
-                onClick={() => setActiveTab(item.id)}
+                onClick={() => onTabChange(item.id)}
                 className={`w-full flex items-center p-3 rounded-lg transition-colors ${
                   activeTab === item.id
                     ? 'bg-blue-600 text-white'
@@ -63,7 +63,7 @@ const Sidebar = ({ isOpen, setIsOpen, activeTab, setActiveTab, onLogout, languag
                 }`}
               >
                 <Icon size={20} className="flex-shrink-0" />
-                {isOpen && (
+                {!collapsed && (
                   <div className="ml-3 text-left">
                     <div className="font-medium">{item.label}</div>
                     <div className="text-xs opacity-75">{item.labelSecondary}</div>
@@ -82,7 +82,7 @@ const Sidebar = ({ isOpen, setIsOpen, activeTab, setActiveTab, onLogout, languag
           className="w-full flex items-center p-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
         >
           <LogOut size={20} className="flex-shrink-0" />
-          {isOpen && (
+          {!collapsed && (
             <div className="ml-3 text-left">
               <div className="font-medium">
                 {language === 'hi' ? 'लॉग आउट' : 'Logout'}
